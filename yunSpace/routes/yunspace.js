@@ -5,7 +5,7 @@ var mysql=require('mysql');
 var TEST_TABLE='yun_account';
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/admin/login', function(req, res, next) {
   var connection=mysql.createConnection(({
     host:'127.0.0.1',
     user:'root',
@@ -20,15 +20,14 @@ router.get('/', function(req, res, next) {
           throw err;
         }
          console.log(res);
-        res.render('index', { users: results});
+        res.render('admin/login/index', { users: results});
         connection.end();
       }
   );
-
 });
-router.get('/login',function(req,res,next){
-  res.render('index', { title: 'asdasdas'});
-});
+//router.get('/login',function(req,res,next){
+//  res.render('index', { title: 'asdasdas'});
+//});
 
 router.get("/header",function(req,res,next){
   res.render('Admin/index', { title: 'Express'});
