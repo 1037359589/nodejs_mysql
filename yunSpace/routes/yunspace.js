@@ -2,35 +2,27 @@ var express = require('express');
 var router = express.Router();
 var path=__dirname;
 var mysql=require('mysql');
+var core=require("../core");
 var TEST_TABLE='yun_account';
+function a(name){
+    this.name=name;
+}
+console.log(core.getInstance(a,'xiaohong'));
 
-/* GET home page. */
-router.get('/admin/login', function(req, res, next) {
-  var connection=mysql.createConnection(({
-    host:'127.0.0.1',
-    user:'root',
-    password : '919927',
-    port: '3306',
-    database: 'test'
-  }));
-  connection.query(
-      'SELECT * FROM '+TEST_TABLE,
-      function selectCb(err, results, fields) {
-        if (err) {
-          throw err;
-        }
-         console.log(res);
+core.requestUrl(router,true,'login',function(req,res,next,connection){
+    core.select(connection,
+        {
+            table:'yun_account',
+            cols:['id as i','username as name',"phone"],
+            additions:'id<50',
+            //limit:20,
+            //offset:10,
+            //group:'',
+            order:'id desc'
+        },
+        function(results,fields){
         res.render('admin/login/index', { users: results});
-        connection.end();
-      }
-  );
-});
-//router.get('/login',function(req,res,next){
-//  res.render('index', { title: 'asdasdas'});
-//});
-
-router.get("/header",function(req,res,next){
-  res.render('Admin/index', { title: 'Express'});
+    });
 });
 
 
