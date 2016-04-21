@@ -4,6 +4,8 @@
 var mysql=require('mysql');
 var util = require('util');
 var core=(function(){
+    var isTable=false;
+    /*sql语句执行*/
     function sqlQuery(connect,sql,fn){
         connect.query(sql,function(err,results,field){
             if (err) {
@@ -14,7 +16,11 @@ var core=(function(){
             }
         });
     }
-    var isTable=false;
+    /*
+    * 创建表
+    * @connect 数据库的链接对象
+    * @sqlObj 传入的参数
+    * */
     function createTable(connect,sqlObj){
         var prefixTable="yun_";
         var createTable="CREATE TABLE IF NOT EXISTS `"+prefixTable+sqlObj.alterCols.table+"`("+
@@ -38,6 +44,12 @@ var core=(function(){
             }
         });
     }
+    /*
+    * 检查是否存在字段
+    * @connect 数据库链接对象
+    * @table 数据表
+    * @col 字段(obj)
+    * */
     function isSetColName(connect,table,col){
         var sql2='desc `'+table+'` '+col.colName;
         //connect.query(sql2,function(err,results){
@@ -54,6 +66,15 @@ var core=(function(){
             }
         });
     }
+    /*
+    * 添加字段
+    * @table 表名
+    * @colName 字段名
+    * @type 类型
+    * @index 索引
+    * @title 字段说明commit
+    * @connect 链接数据库对象
+    * */
     function addAlterCols(table,colName,type,index,title,connect){
         var col=colName==undefined?console.error('ERROR:字段名称不存在!!'):colName,ty,ind,
             tit=title==undefined?"":' COMMENT "'+title+'"';
