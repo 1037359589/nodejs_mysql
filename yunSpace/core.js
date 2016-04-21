@@ -262,7 +262,12 @@ var core=(function(){
             );
         },
         delete:function(connect,sqlObj,fn){
-
+            var sql= 'DELETE FROM '+prefixTable+sqlObj.table+' WHERE '+sqlObj.additions;
+            sqlQuery(connect,sql,function(err,results){
+                if(fn instanceof Function){
+                    fn(results,connect);
+                }
+            });
         }
     }
 }());

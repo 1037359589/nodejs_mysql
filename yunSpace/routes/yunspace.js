@@ -39,15 +39,21 @@ core.requestUrl(router,true,'login',function(req,res,next,connection){
             //}
             res.render('admin/login/index', { users: results});
         });
-    core.update(connection,{
+    //core.update(connection,{
+    //    table:'accounts',
+    //    cols:['username',"phone",'sex','age'],
+    //    value:[changeName,'15002114175','男','10'],
+    //    additions:'username="'+name+'"'
+    //    //order:'id desc',
+    //    //limit:20,
+    //},function(result,connect){
+    //    console.log(result);
+    //});
+    core.delete(connection,{
         table:'accounts',
-        cols:['username',"phone",'sex','age'],
-        value:[changeName,'15002114175','男','10'],
-        additions:'username="'+name+'"'
-        //order:'id desc',
-        //limit:20,
+        additions:'username="'+changeName+'"'
     },function(result,connect){
-        console.log(result);
+
     })
 
 });
