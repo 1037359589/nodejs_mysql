@@ -5,6 +5,7 @@ var mysql=require('mysql');
 var util = require('util');
 var core=(function(){
     var isTable=false;
+    var prefixTable="yun_";
     /*sql语句执行*/
     function sqlQuery(connect,sql,fn){
         connect.query(sql,function(err,results,field){
@@ -22,25 +23,15 @@ var core=(function(){
     * @sqlObj 传入的参数
     * */
     function createTable(connect,sqlObj){
-        var prefixTable="yun_";
-        var createTable="CREATE TABLE IF NOT EXISTS `"+prefixTable+sqlObj.alterCols.table+"`("+
+        var createTable="CREATE TABLE IF NOT EXISTS `"+prefixTable+sqlObj.table+"`("+
             "`id`  int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT  '唯一编号，自增长'," +
             "PRIMARY KEY `id` (`id`)"+
             ") ENGINE=MyISAM  DEFAULT CHARSET=utf8  AUTO_INCREMENT= 1 ";
         console.log(createTable);
-        //connect.query(createTable,function(err){
-        //    if (err) {
-        //        throw err;
-        //    }
-        //    var cols=sqlObj.alterCols.constructor.cols;
-        //    for(var k in cols){
-        //        isSetColName(connect,prefixTable+sqlObj.alterCols.table,cols[k]);
-        //    }
-        //});
         sqlQuery(connect,createTable,function(err,results){
             var cols=sqlObj.alterCols.constructor.cols;
             for(var k in cols){
-                isSetColName(connect,prefixTable+sqlObj.alterCols.table,cols[k]);
+                isSetColName(connect,prefixTable+sqlObj.table,cols[k]);
             }
         });
     }
@@ -52,14 +43,6 @@ var core=(function(){
     * */
     function isSetColName(connect,table,col){
         var sql2='desc `'+table+'` '+col.colName;
-        //connect.query(sql2,function(err,results){
-        //    if (err) {
-        //        throw err;
-        //    }
-        //    if(results.length==0||results==undefined){
-        //        addAlterCols(table,col.colName,col.type,col.index,col.title,connect);
-        //    }
-        //});
         sqlQuery(connect,sql2,function(err,results){
             if(results.length==0||results==undefined){
                 addAlterCols(table,col.colName,col.type,col.index,col.title,connect);
@@ -91,13 +74,6 @@ var core=(function(){
             }
             var sql='ALTER TABLE '+table+' ADD '+col+ty+tit;
             console.log(sql);
-            //connect.query(sql,function(err){
-            //    if (err) {
-            //        console.log("ALTER-ERROR:"+err.message);
-            //        //throw err;
-            //    }
-            //    //connect.release()
-            //});
             sqlQuery(connect,sql);
             if(index!=undefined||""){
                 var sql1;
@@ -122,15 +98,8 @@ var core=(function(){
         }
     }
     function isSetTable(connect,sqlObj){
-        var sql='SHOW TABLES LIKE "'+sqlObj.table+'"';
+        var sql='SHOW TABLES LIKE "'+prefixTable+sqlObj.table+'"';
         console.log(sql);
-        //connect.query(sql,function(err,results){
-        //    if(results.length==0||results==undefined){
-        //        createTable(connect,sqlObj);
-        //    }else{
-        //        isTable=true;
-        //    }
-        //});
         sqlQuery(connect,sql,function(err,results){
             if(results.length==0||results==undefined){
                 createTable(connect,sqlObj);
@@ -216,20 +185,8 @@ var core=(function(){
             }else{
                 colsStr="*";
             }
-            var sql= 'SELECT '+colsStr+' FROM '+sqlObj.table+' WHERE '+sqlObj.additions+groupStr+orderStr+limitStr+offsetStr;
+            var sql= 'SELECT '+colsStr+' FROM '+prefixTable+sqlObj.table+' WHERE '+sqlObj.additions+groupStr+orderStr+limitStr+offsetStr;
             console.log(sql);
-            //connect.query(
-            //    sql,
-            //    function(err, results, fields) {
-            //        if (err) {
-            //            console.log('[SELECT ERROR]-'+err.message);
-            //        }
-            //        if(fn instanceof Function){
-            //            fn(results,fields,connect);
-            //        }
-            //        connect.end();
-            //    }
-            //);
             sqlQuery(connect,sql,function(err,results,fields){
                 if(fn instanceof Function){
                     fn(results,fields,connect);
@@ -259,7 +216,7 @@ var core=(function(){
                             valStr+="?,";
                         }
                         valStr=valStr.substring(0,valStr.length-1);
-                        var sql='INSERT INTO '+sqlObj.table+' ('+colsStr+') VALUES ('+valStr+')';
+                        var sql='INSERT INTO '+prefixTable+sqlObj.table+' ('+colsStr+') VALUES ('+valStr+')';
                         console.log(sql);
                         connect.query(
                             sql,sqlObj.value,
@@ -277,13 +234,36 @@ var core=(function(){
                 }
             },100);
         },
+        update:function(connect,sqlObj,fn){
+            var limitStr=sqlObj.limit==(""||undefined)?"":' limit '+sqlObj.limit,
+                orderStr=sqlObj.order==(""||undefined)?" ":' order by '+sqlObj.order,
+                colsStr;
+            if(util.isArray(sqlObj.cols)){
+                for(var k in sqlObj.cols){
+                    sqlObj.cols[k]=sqlObj.cols[k]+"=?"
+                }
+                colsStr=sqlObj.cols.join(",");
+            }else{
+                console.log("ERROR:cols必须为数组")
+            }
+            var sql= 'UPDATE '+prefixTable+sqlObj.table+' SET '+colsStr+' WHERE '+sqlObj.additions+orderStr+limitStr;
+            console.log(sql);
+            connect.query(
+                sql,sqlObj.value,
+                function(err, results) {
+                    if (err) {
+                        console.log('[UPDATE ERROR]-'+err.message);
+                    }
+                    if(fn instanceof Function){
+                        fn(results,connect);
+                    }
+                    //connect.release()
+                }
+            );
+        },
         delete:function(connect,sqlObj,fn){
 
-        },
-        update:function(connect,sqlObj,fn){
-
         }
-
     }
 }());
 module.exports=core;

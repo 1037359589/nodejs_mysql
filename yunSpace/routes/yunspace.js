@@ -10,20 +10,21 @@ function a(name){
 }
 console.log(typeof 10,222);
 console.log(core.getInstance(a,'xiaohong'));
-var name = 'pzlpzlpzl';
+var name = 'pzlpzlpzlpzl';
+var changeName='pzlbll';
 core.requestUrl(router,true,'login',function(req,res,next,connection){
-    core.insert(connection,
-        {
-            table:'yun_accounts',
-            cols:['username',"phone",'sex','age'],
-            value:[name,'15002119191','男','9'],
-            alterCols:accounts
-        },function(results){
-            //console.log(results);
-        });
+    //core.insert(connection,
+    //    {
+    //        table:'accounts',
+    //        cols:['username',"phone",'sex','age'],
+    //        value:[name,'15002119191','男','9'],
+    //        alterCols:accounts
+    //    },function(results){
+    //        //console.log(results);
+    //    });
     core.select(connection,
         {
-            table:'yun_account',
+            table:'account',
             cols:['id as i','username as name',"phone"],
             additions:'username="'+name+'"',
             //limit:20,
@@ -38,6 +39,16 @@ core.requestUrl(router,true,'login',function(req,res,next,connection){
             //}
             res.render('admin/login/index', { users: results});
         });
+    core.update(connection,{
+        table:'accounts',
+        cols:['username',"phone",'sex','age'],
+        value:[changeName,'15002114175','男','10'],
+        additions:'username="'+name+'"'
+        //order:'id desc',
+        //limit:20,
+    },function(result,connect){
+        console.log(result);
+    })
 
 });
 

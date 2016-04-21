@@ -2,7 +2,6 @@
  * Created by bll on 16/4/20.
  */
 var accounts={
-    table:"accounts",
     constructor:{
         cols:[
             {
