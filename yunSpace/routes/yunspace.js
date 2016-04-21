@@ -10,7 +10,7 @@ function a(name){
 }
 console.log(typeof 10,222);
 console.log(core.getInstance(a,'xiaohong'));
-var name = 'pzl';
+var name = 'pzlpzlpzl';
 core.requestUrl(router,true,'login',function(req,res,next,connection){
     core.insert(connection,
         {

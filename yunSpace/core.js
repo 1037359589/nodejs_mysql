@@ -276,9 +276,6 @@ var core=(function(){
                     }
                 }
             },100);
-
-            //createTable(connect,sqlObj);
-
         },
         delete:function(connect,sqlObj,fn){
 
