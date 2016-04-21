@@ -10,8 +10,17 @@ function a(name){
 }
 console.log(typeof 10,222);
 console.log(core.getInstance(a,'xiaohong'));
-var name = 'pzzzzzzzl暗示ll';
+var name = 'pzl';
 core.requestUrl(router,true,'login',function(req,res,next,connection){
+    core.insert(connection,
+        {
+            table:'yun_accounts',
+            cols:['username',"phone",'sex','age'],
+            value:[name,'15002119191','男','9'],
+            alterCols:accounts
+        },function(results){
+            //console.log(results);
+        });
     core.select(connection,
         {
             table:'yun_account',
@@ -24,20 +33,12 @@ core.requestUrl(router,true,'login',function(req,res,next,connection){
         },
         function(results,fields,connection){
             //console.log(results);
-            if(results.name==name){
-                connection.destroy();
-            }
-        res.render('admin/login/index', { users: results});
-    });
-    core.insert(connection,
-        {
-            table:'yun_accounts',
-            cols:['username',"phone",'sex'],
-            value:[name,'15002119191','男'],
-            alterCols:accounts
-        },function(results){
-            //console.log(results);
-        })
+            //if(results.name==name){
+            //    connection.destroy();
+            //}
+            res.render('admin/login/index', { users: results});
+        });
+
 });
 
 

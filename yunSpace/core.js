@@ -4,6 +4,17 @@
 var mysql=require('mysql');
 var util = require('util');
 var core=(function(){
+    function sqlQuery(connect,sql,fn){
+        connect.query(sql,function(err,results,field){
+            if (err) {
+                console.log("ERROR:"+err.message);
+            }
+            if(fn instanceof Function){
+                fn(err,results,field);
+            }
+        });
+    }
+    var isTable=false;
     function createTable(connect,sqlObj){
         var prefixTable="yun_";
         var createTable="CREATE TABLE IF NOT EXISTS `"+prefixTable+sqlObj.alterCols.table+"`("+
@@ -11,18 +22,39 @@ var core=(function(){
             "PRIMARY KEY `id` (`id`)"+
             ") ENGINE=MyISAM  DEFAULT CHARSET=utf8  AUTO_INCREMENT= 1 ";
         console.log(createTable);
-        connect.query(createTable,function(err){
-            if (err) {
-                throw err;
-            }
+        //connect.query(createTable,function(err){
+        //    if (err) {
+        //        throw err;
+        //    }
+        //    var cols=sqlObj.alterCols.constructor.cols;
+        //    for(var k in cols){
+        //        isSetColName(connect,prefixTable+sqlObj.alterCols.table,cols[k]);
+        //    }
+        //});
+        sqlQuery(connect,createTable,function(err,results){
             var cols=sqlObj.alterCols.constructor.cols;
             for(var k in cols){
-                addAlterCols(sqlObj.alterCols.table,cols[k].colName,cols[k].type,cols[k].index,cols[k].title,connect);
+                isSetColName(connect,prefixTable+sqlObj.alterCols.table,cols[k]);
+            }
+        });
+    }
+    function isSetColName(connect,table,col){
+        var sql2='desc `'+table+'` '+col.colName;
+        //connect.query(sql2,function(err,results){
+        //    if (err) {
+        //        throw err;
+        //    }
+        //    if(results.length==0||results==undefined){
+        //        addAlterCols(table,col.colName,col.type,col.index,col.title,connect);
+        //    }
+        //});
+        sqlQuery(connect,sql2,function(err,results){
+            if(results.length==0||results==undefined){
+                addAlterCols(table,col.colName,col.type,col.index,col.title,connect);
             }
         });
     }
     function addAlterCols(table,colName,type,index,title,connect){
-        console.log(4444);
         var col=colName==undefined?console.error('ERROR:字段名称不存在!!'):colName,ty,ind,
             tit=title==undefined?"":' COMMENT "'+title+'"';
         if(type==undefined){
@@ -36,40 +68,55 @@ var core=(function(){
                     ty=' varchar('+type+')';
                     break;
             }
-            var sql='ALTER TABLE yun_'+table+' ADD '+col+ty+tit;
+            var sql='ALTER TABLE '+table+' ADD '+col+ty+tit;
             console.log(sql);
-            connect.query(sql,function(err){
-                if (err) {
-                    console.log("ERROR-:"+err.message,1);
-                    //throw err;
-                }
-                //connect.release()
-            });
+            //connect.query(sql,function(err){
+            //    if (err) {
+            //        console.log("ALTER-ERROR:"+err.message);
+            //        //throw err;
+            //    }
+            //    //connect.release()
+            //});
+            sqlQuery(connect,sql);
             if(index!=undefined||""){
                 var sql1;
                 switch (index){
                     case 'u':
-                        sql1='ALTER TABLE yun_'+table+' ADD unique emp_name('+col+')';
+                        sql1='ALTER TABLE '+table+' ADD unique emp_name('+col+')';
                         break;
                     case 'i':
-                        sql1='ALTER TABLE yun_'+table+' add index index_name('+col+')';
+                        sql1='ALTER TABLE '+table+' add index index_name('+col+')';
                         break;
                 }
                 console.log(sql1);
                 connect.query(sql1,function(err){
                     if (err) {
-                        console.log("ERROR-:"+err.message,2);
+                        console.log("ALTER-ERROR:"+err.message);
                         //throw err;
                     }
                     //connect.release();
                 });
             }
-
-
-
+            isTable=true;
         }
-
-
+    }
+    function isSetTable(connect,sqlObj){
+        var sql='SHOW TABLES LIKE "'+sqlObj.table+'"';
+        console.log(sql);
+        //connect.query(sql,function(err,results){
+        //    if(results.length==0||results==undefined){
+        //        createTable(connect,sqlObj);
+        //    }else{
+        //        isTable=true;
+        //    }
+        //});
+        sqlQuery(connect,sql,function(err,results){
+            if(results.length==0||results==undefined){
+                createTable(connect,sqlObj);
+            }else{
+                isTable=true;
+            }
+        });
     }
     return {
         ROOT:__dirname,
@@ -150,53 +197,67 @@ var core=(function(){
             }
             var sql= 'SELECT '+colsStr+' FROM '+sqlObj.table+' WHERE '+sqlObj.additions+groupStr+orderStr+limitStr+offsetStr;
             console.log(sql);
-            connect.query(
-                sql,
-                function(err, results, fields) {
-                    if (err) {
-                        console.log('[SELECT ERROR]-'+err.message);
-                    }
-                    if(fn instanceof Function){
-                        fn(results,fields,connect);
-                    }
-                    connect.end();
+            //connect.query(
+            //    sql,
+            //    function(err, results, fields) {
+            //        if (err) {
+            //            console.log('[SELECT ERROR]-'+err.message);
+            //        }
+            //        if(fn instanceof Function){
+            //            fn(results,fields,connect);
+            //        }
+            //        connect.end();
+            //    }
+            //);
+            sqlQuery(connect,sql,function(err,results,fields){
+                if(fn instanceof Function){
+                    fn(results,fields,connect);
                 }
-            );
+                connect.end();
+            });
         },
         insert:function(connect,sqlObj,fn){
-            createTable(connect,sqlObj);
-            if(sqlObj.cols.length!=sqlObj.value.length){
-                console.error('数组长度不统一!!');
-                return;
-            }
-            var colsStr=util.isArray(sqlObj.cols)?sqlObj.cols.join(","):false;
-            var valueStr=util.isArray(sqlObj.value)?sqlObj.value.join(","):false;
-            if(!colsStr||!valueStr){
-                console.error('字段和value必须为数组!!');
-                return;
-            }
-            valStr="";
-            for(var k in sqlObj.cols){
-                valStr+="?,";
-            }
-            valStr=valStr.substring(0,valStr.length-1);
-            var sql='INSERT INTO '+sqlObj.table+' ('+colsStr+') VALUES ('+valStr+')';
-            console.log(sql);
-            console.log(sqlObj.value);
-            connect.query(
-                sql,sqlObj.value,
-                function(err, results) {
-                    console.log(1212121);
-                    if (err) {
-                        console.log('[INSERT ERROR]-'+err.message);
-                        return;
+            var is=false;
+            var t=setInterval(function(){
+                isSetTable(connect,sqlObj);
+                if(isTable){
+                    clearInterval(t);
+                    if(isTable){
+                        if(sqlObj.cols.length!=sqlObj.value.length){
+                            console.error('数组长度不统一!!');
+                            return;
+                        }
+                        var colsStr=util.isArray(sqlObj.cols)?sqlObj.cols.join(","):false;
+                        var valueStr=util.isArray(sqlObj.value)?sqlObj.value.join(","):false;
+                        if(!colsStr||!valueStr){
+                            console.error('字段和value必须为数组!!');
+                            return;
+                        }
+                        var valStr="";
+                        for(var k in sqlObj.cols){
+                            valStr+="?,";
+                        }
+                        valStr=valStr.substring(0,valStr.length-1);
+                        var sql='INSERT INTO '+sqlObj.table+' ('+colsStr+') VALUES ('+valStr+')';
+                        console.log(sql);
+                        connect.query(
+                            sql,sqlObj.value,
+                            function(err, results) {
+                                if (err) {
+                                    console.log('[INSERT ERROR]-'+err.message);
+                                }
+                                if(fn instanceof Function){
+                                    fn(results,connect);
+                                }
+                                //connect.release()
+                            }
+                        );
                     }
-                    if(fn instanceof Function){
-                        fn(results,connect);
-                    }
-                    //connect.release()
                 }
-            );
+            },100);
+
+            //createTable(connect,sqlObj);
+
         },
         delete:function(connect,sqlObj,fn){
 
