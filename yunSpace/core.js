@@ -187,12 +187,14 @@ var core=(function(){
             }
             var sql= 'SELECT '+colsStr+' FROM '+prefixTable+sqlObj.table+' WHERE '+sqlObj.additions+groupStr+orderStr+limitStr+offsetStr;
             console.log(sql);
-            sqlQuery(connect,sql,function(err,results,fields){
+            var data=sqlQuery(connect,sql,function(err,results,fields){
                 if(fn instanceof Function){
                     fn(results,fields,connect);
                 }
                 connect.end();
+                return {err:err,results:results,fields:fields}
             });
+            return data;
         },
         insert:function(connect,sqlObj,fn){
             var is=false;

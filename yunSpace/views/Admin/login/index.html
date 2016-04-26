@@ -10,6 +10,15 @@
     <% users.forEach(function(name){ %>
     <li><%= name.i %>/<%= name.name %>/<%= name.phone %></li>
     <% }) %>
+    <script src="/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://localhost:8080');
+        socket.on('news', function (data) {
+            console.log(12312);
+            console.log(data);
+            socket.emit('my other event', { my: 'data' });
+        });
+    </script>
 </ul>
 </body>
 </html>

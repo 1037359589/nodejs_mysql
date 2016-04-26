@@ -1,4 +1,7 @@
 var express = require('express');
+var app = express();
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
 var ejs = require('ejs');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -7,9 +10,10 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 
-var yunspace = require('./routes/yunspace');
 
-var app = express();
+var yunspace = require('./routes/yunspace');
+var sockets= require('./socket.core');
+
 app.listen(2000);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

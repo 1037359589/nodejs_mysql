@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<%= users%>
+<script src="/socket.io.js"></script>
+<script>
+    var socket = io.connect('http://localhost:8080');
+    socket.on('news', function (data) {
+        console.log(12312);
+        console.log(data);
+        socket.emit('my other event', { my: 'data' });
+    });
+</script>
+</body>
+</html>
