@@ -57,20 +57,20 @@ core.requestUrl(router,true,'login',function(req,res,next,connection){
     //})
 });
 /*
-*
-* next('route') 跳路由访问
-* */
+ *
+ * next('route') 跳路由访问
+ * */
 //router.use('admin/test/:id', function (req, res, next) {
 //    console.log('Request Type:', req.method);
 //    next();
 //});
 
-//core.requestUrl(router,true,'test/:id',function(req,res,next,connection){
-//    if (req.params.id == 0){
-//        console.log(req.params.id,12312);
-//        res.render('admin/test', { users: "pzlpzl"});
-//    }else    next('route');
-//});
+core.requestUrl(router,true,'test/:id',function(req,res,next,connection){
+    if (req.params.id == 0){
+        console.log(req.params.id,12312);
+        res.render('Admin/test', { users: "pzlpzl"});
+    }else    next('route');
+});
 //core.requestUrl(router,true,'test/:id',function(req,res,next,connection){
 //    if (req.params.id == 1){
 //        console.log(req.params.id,123192922);

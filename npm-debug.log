@@ -2,18 +2,18 @@
 1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'start' ]
 2 info using npm@2.14.7
 3 info using node@v4.2.2
-4 verbose stack Error: ENOENT: no such file or directory, open '/Applications/MAMP/htdocs/node_pro/package.json'
+4 verbose stack Error: ENOENT: no such file or directory, open '/Applications/MAMP/htdocs/node_pro_3/package.json'
 4 verbose stack     at Error (native)
-5 verbose cwd /Applications/MAMP/htdocs/node_pro
+5 verbose cwd /Applications/MAMP/htdocs/node_pro_3
 6 error Darwin 14.5.0
 7 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "start"
 8 error node v4.2.2
 9 error npm  v2.14.7
-10 error path /Applications/MAMP/htdocs/node_pro/package.json
+10 error path /Applications/MAMP/htdocs/node_pro_3/package.json
 11 error code ENOENT
 12 error errno -2
 13 error syscall open
-14 error enoent ENOENT: no such file or directory, open '/Applications/MAMP/htdocs/node_pro/package.json'
+14 error enoent ENOENT: no such file or directory, open '/Applications/MAMP/htdocs/node_pro_3/package.json'
 14 error enoent This is most likely not a problem with npm itself
 14 error enoent and is related to npm not being able to find a file.
 15 verbose exit [ -2, true ]

@@ -1,19 +1,151 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+
+    <!--<link rel="stylesheet" type="text/css" href="/bootstrap.min.css" />-->
+    <!--<link rel="stylesheet" type="text/css" href="/stylesheets/signin.css" />-->
 </head>
+
 <body>
-<%= users%>
-<script src="/socket.io.js"></script>
-<script>
-    var socket = io.connect('http://localhost:8080');
-    socket.on('news', function (data) {
-        console.log(12312);
-        console.log(data);
-        socket.emit('my other event', { my: 'data' });
-    });
-</script>
+
+<div id="container" class="container">
+    <% if (locals.success) { %>
+    <div id="alt_sucess" class="alert alert-success">
+        <%- success %>
+    </div>
+    <% } %>
+
+    <% if (locals.error) { %>
+    <div id="alt_warning" class="alert alert-warning">
+        <%= error %>
+    </div>
+    <% } %>
+
+    <form class="form-signin" role="form" method="post" enctype='multipart/form-data' id="frmUploadFile" action='javascript:;'>
+        <h2 class="form-signin-heading">上传文件</h2>
+        <input id="fulAvatar" name="fulAvatar" type="file" class="form-control" />
+        <!--<input id="fulAvatars" name="fulAvatar" type="text" class="form-control" />-->
+        <br/>
+        <button id="btnSub" class="btn btn-lg btn-primary" type="button" onClick = "uploadFile()">上 传</button>
+    </form>
+    <button id="btnSub2" class="btn btn-lg btn-primary" type="submit" >获取ajax</button>
+    <form action="/file/uploading"  enctype='multipart/form-data' method='post' class="form-signin">
+        <input  name='inputFile' type='file'  multiple='mutiple' class="form-control" >
+        <input  name="btnUp" type="submit" value="上传" class="form-control" >
+    </form>
+
+
+</div>
 </body>
 </html>
+
+<script src="/jquery-1.11.3.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    function uploadFile(){
+        var formData = new FormData($("#frmUploadFile")[0]);
+//        var formData=$("#fulAvatar").val();
+        console.log(formData);
+        $.ajax({
+            url: '/upload',
+            type: 'POST',
+            data:formData,
+            async: false,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function(data){
+                if(200 === data.code) {
+                    $("#imgShow").attr('src', data.msg.url);
+                    $("#spanMessage").html("上传成功");
+                } else {
+                    $("#spanMessage").html("上传失败");
+                }
+                console.log('imgUploader upload success, data:', data);
+            },
+            error: function(){
+                $("#spanMessage").html("与服务器通信发生错误");
+            }
+        });
+    }
+    String.prototype.format = function (args) {
+        var result = this;
+        if (arguments.length > 0) {
+            if (arguments.length == 1 && typeof (args) == "object") {
+                for (var key in args) {
+                    if (args[key] != undefined) {
+                        var reg = new RegExp("({" + key + "})", "g");
+                        result = result.replace(reg, args[key]);
+                    }
+                }
+            }
+            else {
+                for (var i = 0; i < arguments.length; i++) {
+                    if (arguments[i] != undefined) {
+                        var reg = new RegExp("({)" + i + "(})", "g");
+                        result = result.replace(reg, arguments[i]);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    $(function(){
+        $('#btnSub').on('click',function(){
+            var fulAvatarVal = $('#fulAvatar').val(),
+                    errorTip = '<div id="errorTip" class="alert alert-warning">{0}</div> ';
+
+            $("#errorTip,#alt_warning").remove();
+
+            if(fulAvatarVal.length == 0)
+            {
+                $("#container").prepend(errorTip.format('请选择要上传的文件'));
+                return false;
+            }
+
+            var extName = fulAvatarVal.substring(fulAvatarVal.lastIndexOf('.'),fulAvatarVal.length).toLowerCase();
+
+            if(extName != '.png' && extName != '.jpg'){
+                $("#container").prepend(errorTip.format('只支持png和jpg格式图片'));
+                return false;
+            }
+
+            return true;
+        });
+//        $("#btnSub2").on('click',function(){
+//            var fulAvatarVal = $('#fulAvatar').val(),
+//                    errorTip = '<div id="errorTip" class="alert alert-warning">{0}</div> ';
+//            console.log(fulAvatarVal);
+//
+//            $("#errorTip,#alt_warning").remove();
+//
+//            if(fulAvatarVal.length == 0)
+//            {
+//                $("#container").prepend(errorTip.format('请选择要上传的文件'));
+//                return false;
+//            }
+//
+//            var extName = fulAvatarVal.substring(fulAvatarVal.lastIndexOf('.'),fulAvatarVal.length).toLowerCase();
+//
+//            if(extName != '.png' && extName != '.jpg'){
+//                $("#container").prepend(errorTip.format('只支持png和jpg格式图片'));
+//                return false;
+//            }
+//            $.ajax({
+//                type: "POST",
+//                url: "/upload",
+//                data: {file:fulAvatarVal},
+//                dataType:'json',
+//                success: function(msg){
+//                    console.log( msg );
+//                }
+//            });
+//        });
+    });
+
+</script>
