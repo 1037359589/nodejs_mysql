@@ -26,17 +26,17 @@ router.post('/uploading',function(req, res, next){
     //    console.log(chunk);
     //});
     var form = new formidable.IncomingForm();
-    form.uploadDir = "public/uploads/";
+    form.uploadDir = "uploads/";
     form.name='index';
     form.keepExtensions = true;
     console.log(form);
-    var  ffiles = {};
-    form.on('file', function(name, file) {
-        if (typeof ffiles[name] !== 'object' || ffiles[name] === null) {
-            ffiles[name] = {};
-        }
-        ffiles[name][file.name] = file;
-    });
+    //var  ffiles = {};
+    //form.on('file', function(name, file) {
+    //    if (typeof ffiles[name] !== 'object' || ffiles[name] === null) {
+    //        ffiles[name] = {};
+    //    }
+    //    ffiles[name][file.name] = file;
+    //});
     form.parse(req,function(err, fields, files){
         console.log(files.inputFile.name);
         var types = files.inputFile.name.split('.');
@@ -65,6 +65,8 @@ router.post('/uploading',function(req, res, next){
         }
         if(extName.length == 0){
             res.locals.error = '只支持png和jpg格式图片';
+            res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
+            res.end(res.locals.error);
             //res.render('index', { title: TITLE });
             return;
         }

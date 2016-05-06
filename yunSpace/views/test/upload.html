@@ -5,7 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
-
     <!--<link rel="stylesheet" type="text/css" href="/bootstrap.min.css" />-->
     <!--<link rel="stylesheet" type="text/css" href="/stylesheets/signin.css" />-->
 </head>
@@ -26,7 +25,7 @@
     <% } %>
     <form action="javascript:;"  enctype='multipart/form-data' method='post' class="form-signin" id="form-one">
         <!--<input type="text" name="username" id="username">-->
-        <input  name='inputFile' type='file' class="form-control" >
+        <input  name='inputFile' type='file' class="form-control">
         <input  name="btnUp" type="submit" value="上传" class="form-control"  onClick = "uploadFile()" >
     </form>
 </div>
@@ -38,9 +37,6 @@
 <script type="text/javascript">
     function uploadFile(){
         var formData = new FormData(document.getElementById("form-one"));
-//        var formData=$("#fulAvatar").val();
-//        console.log(formData.values());
-//        var file=$('input[name="inputFile"]').val();
         $.ajax({
             url: '/uploading',
             type: 'POST',
@@ -108,35 +104,6 @@
 
             return true;
         });
-//        $("#btnSub2").on('click',function(){
-//            var fulAvatarVal = $('#fulAvatar').val(),
-//                    errorTip = '<div id="errorTip" class="alert alert-warning">{0}</div> ';
-//            console.log(fulAvatarVal);
-//
-//            $("#errorTip,#alt_warning").remove();
-//
-//            if(fulAvatarVal.length == 0)
-//            {
-//                $("#container").prepend(errorTip.format('请选择要上传的文件'));
-//                return false;
-//            }
-//
-//            var extName = fulAvatarVal.substring(fulAvatarVal.lastIndexOf('.'),fulAvatarVal.length).toLowerCase();
-//
-//            if(extName != '.png' && extName != '.jpg'){
-//                $("#container").prepend(errorTip.format('只支持png和jpg格式图片'));
-//                return false;
-//            }
-//            $.ajax({
-//                type: "POST",
-//                url: "/upload",
-//                data: {file:fulAvatarVal},
-//                dataType:'json',
-//                success: function(msg){
-//                    console.log( msg );
-//                }
-//            });
-//        });
     });
 
 </script>
