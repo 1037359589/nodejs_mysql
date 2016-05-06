@@ -9,26 +9,10 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-//var upload=(function(){
-//  app.post('/upload', multipart(), function(req, res){
-//    console.log( req.files,req.files.fulAvatar.originalFilename, path.basename(req.files.fulAvatar.path));
-//    //get filename
-//    var filename = req.files.fulAvatar.originalFilename || path.basename(req.files.fulAvatar.path);
-//    console.log(filename);
-//    //copy file to a public directory
-//    var targetPath = path.dirname(__filename) + '/public/' + filename;
-//    console.log(targetPath);
-//    //copy file
-//    fs.createReadStream(req.files.fulAvatar.path).pipe(fs.createWriteStream(targetPath));
-//    //return file url
-//    res.json({code: 200, msg: {url: 'http://' + req.headers.host + '/' + filename}});
-//  });
-//})();
-
 //var yunspace = require('./routes/yunspace');
 //var sockets= require('./socket.core');
 //var upload=require('./plugin/upload');
-var uploads=require('./routes/upload');
+var uploads=require('./server_api/upload');
 
 app.listen(2000);
 // view engine setup
@@ -43,7 +27,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //app.use('/', yunspace);
-app.use(uploads);
+app.use("/",uploads);
 console.log('正在监听端口3000');
 
 // catch 404 and forward to error handler

@@ -3,6 +3,8 @@
  */
 var mysql=require('mysql');
 var util = require('util');
+var multiparty = require('multiparty');
+var fs = require('fs');
 var core=(function(){
     var isTable=false;
     var prefixTable="yun_";
@@ -107,6 +109,19 @@ var core=(function(){
                 isTable=true;
             }
         });
+    }
+    /*
+    * 判断上传图片扩展名
+    * */
+    function extOk(ext){
+        var extArr=['jpg','jpeg','png','swf'];
+        return extArr.indexOf(ext)<0?false:true;
+    }
+    /*
+    * 判断文件上传的大小
+    * */
+    function sizeOk(size){
+        return size<1024*1024*10?true:false;
     }
     return {
         ROOT:__dirname,
@@ -270,7 +285,57 @@ var core=(function(){
                     fn(results,connect);
                 }
             });
+        },
+        /*
+        * 上传文件
+        * @fileName input的name
+        * @ fileType 上传的文件的格式(bool),true为只能上传图片,反之,无限制
+        * @ fn 执行文件操作后的回调函数,自带file的路径参数
+        * */
+        upload:function(req, res, next,fileName,fileType,fn){
+            var file="";
+            //生成multiparty对象，并配置上传目标路径
+            var form = new multiparty.Form({uploadDir: './public/uploads/'});
+            //上传完成后处理
+            form.parse(req, function(err, fields, files) {
+                var filesTmp = JSON.stringify(files,null,2);
+                if(err){
+                    console.log('parse error: ' + err);
+                } else {
+                    //console.log('parse files: ' + filesTmp);
+                    var inputFile = files.inputFile[0];
+                    var uploadedPath = inputFile.path;
+                    var dstPath = './public/uploads/' + inputFile.originalFilename;
+                    //重命名为真实文件名
+                    fs.rename(uploadedPath, dstPath, function(err) {
+                        if(err){
+                            console.log('rename error: ' + err);
+                        } else {
+                            console.log('rename ok');
+                        }
+                    });
+                }
+                files[fileName].forEach(function(v,k){
+                    var ext=v.originalFilename.substring(v.originalFilename.indexOf('.')+1);
+                    //if(fileType&&!extOk(ext)){
+                    //    console.log(2);
+                    //    res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
+                    //    res.write('图片格式不正确!');
+                    //    return;
+                    //}
+                    //if(!sizeOk(v.size)){
+                    //    res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
+                    //    res.write('上传文件最大不能超过10M!');
+                    //}
+                    file+= v.path+","
+                });
+                if(fn instanceof Function){
+                    fn(file);
+                }
+            });
+            res.end();
         }
+
     }
 }());
 module.exports=core;

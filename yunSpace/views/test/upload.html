@@ -24,21 +24,11 @@
         <%= error %>
     </div>
     <% } %>
-
-    <form class="form-signin" role="form" method="post" enctype='multipart/form-data' id="frmUploadFile" action='javascript:;'>
-        <h2 class="form-signin-heading">上传文件</h2>
-        <input id="fulAvatar" name="fulAvatar" type="file" class="form-control" />
-        <!--<input id="fulAvatars" name="fulAvatar" type="text" class="form-control" />-->
-        <br/>
-        <button id="btnSub" class="btn btn-lg btn-primary" type="button" onClick = "uploadFile()">上 传</button>
+    <form action="javascript:;"  enctype='multipart/form-data' method='post' class="form-signin" id="form-one">
+        <!--<input type="text" name="username" id="username">-->
+        <input  name='inputFile' type='file' class="form-control" >
+        <input  name="btnUp" type="submit" value="上传" class="form-control"  onClick = "uploadFile()" >
     </form>
-    <button id="btnSub2" class="btn btn-lg btn-primary" type="submit" >获取ajax</button>
-    <form action="/file/uploading"  enctype='multipart/form-data' method='post' class="form-signin">
-        <input  name='inputFile' type='file'  multiple='mutiple' class="form-control" >
-        <input  name="btnUp" type="submit" value="上传" class="form-control" >
-    </form>
-
-
 </div>
 </body>
 </html>
@@ -47,11 +37,12 @@
 
 <script type="text/javascript">
     function uploadFile(){
-        var formData = new FormData($("#frmUploadFile")[0]);
+        var formData = new FormData(document.getElementById("form-one"));
 //        var formData=$("#fulAvatar").val();
-        console.log(formData);
+//        console.log(formData.values());
+//        var file=$('input[name="inputFile"]').val();
         $.ajax({
-            url: '/upload',
+            url: '/uploading',
             type: 'POST',
             data:formData,
             async: false,
