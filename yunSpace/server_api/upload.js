@@ -6,6 +6,7 @@ var router = express.Router();
 var multiparty = require('multiparty');
 var util = require('util');
 var fs = require('fs');
+var uuid = require('node-uuid');
 var formidable = require('formidable');
 var core=require("../core");
 router.get('/upload', function(req, res,next) {
@@ -20,23 +21,12 @@ router.post('/file/uploading', function(req, res, next){
     });
 });
 router.post('/uploading',function(req, res, next){
-    console.log(req.body,'mmm');
-    //req.on('data', function(chunk) {
-    //    console.log("Received body data:");
-    //    console.log(chunk);
-    //});
+    var newPath;
     var form = new formidable.IncomingForm();
     form.uploadDir = "uploads/";
     form.name='index';
     form.keepExtensions = true;
-    console.log(form);
-    //var  ffiles = {};
-    //form.on('file', function(name, file) {
-    //    if (typeof ffiles[name] !== 'object' || ffiles[name] === null) {
-    //        ffiles[name] = {};
-    //    }
-    //    ffiles[name][file.name] = file;
-    //});
+    form.maxFieldsSize = 5 * 1024 * 1024; //5M
     form.parse(req,function(err, fields, files){
         console.log(files.inputFile.name);
         var types = files.inputFile.name.split('.');
@@ -44,11 +34,12 @@ router.post('/uploading',function(req, res, next){
 
         var ms  = Date.parse(date);
         var extName = '';  //后缀名
-        if (err) {
-            res.locals.error = err;
-            res.render('index', { title: TITLE });
-            return;
-        }
+        //if (err) {
+        //    res.locals.error = err;
+        //    res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
+        //    res.end(res.locals.error);
+        //    return;
+        //}
         switch (files.inputFile.type) {
             case 'image/jpg':
                 extName = 'jpg';
@@ -63,22 +54,23 @@ router.post('/uploading',function(req, res, next){
                 extName = 'png';
                 break;
         }
-        if(extName.length == 0){
-            res.locals.error = '只支持png和jpg格式图片';
-            res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
-            res.end(res.locals.error);
-            //res.render('index', { title: TITLE });
-            return;
-        }
-        var avatarName =date + '.' + extName;
-        var newPath = form.uploadDir + avatarName;
-        fs.renameSync(files.inputFile.path, newPath);
+        //if(extName.length == 0){
+        //    res.locals.error = '只支持png和jpg格式图片';
+        //    res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
+        //    res.end(res.locals.error);
+        //    return;
+        //}
+        var avatarName =uuid.v1() + '.' + extName;
+        newPath = form.uploadDir + avatarName;
+        fs.renameSync(files.inputFile.path, newPath)
     });
-    //
     form.on('end', function() {
-        res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
-        res.end('上传成功!!');
+        console.log(newPath ,12312311231232312);
+        //res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
+        res.send({status:'1',msg:"上传成功",filePath:newPath});
+        //res.status(200).end(newPath);
     });
+
     //生成multiparty对象，并配置上传目标路径
     console.log(req.body);
 });
