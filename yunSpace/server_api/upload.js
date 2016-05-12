@@ -27,13 +27,12 @@ router.post('/uploading',function(req, res, next){
     form.name='index';
     form.keepExtensions = true;
     form.maxFieldsSize = 5 * 1024 * 1024; //5M
+    var extName = '';  //后缀名
     form.parse(req,function(err, fields, files){
         console.log(files.inputFile.name);
         var types = files.inputFile.name.split('.');
         var date  = new Date();
-
         var ms  = Date.parse(date);
-        var extName = '';  //后缀名
         if (err) {
             res.locals.error = err;
             res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
@@ -54,19 +53,17 @@ router.post('/uploading',function(req, res, next){
                 extName = 'png';
                 break;
         }
-        if(extName.length == 0){
-            res.locals.error = '只支持png和jpg格式图片';
-            res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
-            res.end(res.locals.error);
-            return;
-        }
         var avatarName =uuid.v1() + '.' + extName;
         newPath = form.uploadDir + avatarName;
         fs.renameSync(files.inputFile.path, newPath)
     });
     form.on('end', function() {
+        if(extName.length == 0){
+            res.send({status:'0',msg:"只支持png和jpg格式图片",filePath:""})
+        }else{
+            res.send({status:'1',msg:"上传成功",filePath:newPath});
+        }
         //res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
-        res.send({status:'1',msg:"上传成功",filePath:newPath});
         //res.status(200).end(newPath);
     });
 
