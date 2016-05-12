@@ -10,20 +10,20 @@ var uuid = require('node-uuid');
 var formidable = require('formidable');
 var core=require("../core");
 router.get('/upload', function(req, res,next) {
-    res.render('test/upload', { title: 'dasdasd' });
+    res.render('test/upload', { title: 'dasdasd',root:"localhost:3000/" });
 });
 /* 上传*/
-router.post('/file/uploading', function(req, res, next){
-    //生成multiparty对象，并配置上传目标路径
-    console.log(req.body);
-    core.upload(req, res, next,'inputFile',true,function(filePath){
-        console.log(filePath,123123);
-    });
-});
+//router.post('/file/uploading', function(req, res, next){
+//    //生成multiparty对象，并配置上传目标路径
+//    //console.log(req.body);
+//    core.upload(req, res, next,'inputFile',true,function(filePath){
+//        console.log(filePath,123123);
+//    });
+//});
 router.post('/uploading',function(req, res, next){
     var newPath;
     var form = new formidable.IncomingForm();
-    form.uploadDir = "uploads/";
+    form.uploadDir = "public/uploads/";
     form.name='index';
     form.keepExtensions = true;
     form.maxFieldsSize = 5 * 1024 * 1024; //5M
