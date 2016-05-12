@@ -34,12 +34,12 @@ router.post('/uploading',function(req, res, next){
 
         var ms  = Date.parse(date);
         var extName = '';  //后缀名
-        //if (err) {
-        //    res.locals.error = err;
-        //    res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
-        //    res.end(res.locals.error);
-        //    return;
-        //}
+        if (err) {
+            res.locals.error = err;
+            res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
+            res.end(res.locals.error);
+            return;
+        }
         switch (files.inputFile.type) {
             case 'image/jpg':
                 extName = 'jpg';
@@ -54,18 +54,17 @@ router.post('/uploading',function(req, res, next){
                 extName = 'png';
                 break;
         }
-        //if(extName.length == 0){
-        //    res.locals.error = '只支持png和jpg格式图片';
-        //    res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
-        //    res.end(res.locals.error);
-        //    return;
-        //}
+        if(extName.length == 0){
+            res.locals.error = '只支持png和jpg格式图片';
+            res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
+            res.end(res.locals.error);
+            return;
+        }
         var avatarName =uuid.v1() + '.' + extName;
         newPath = form.uploadDir + avatarName;
         fs.renameSync(files.inputFile.path, newPath)
     });
     form.on('end', function() {
-        console.log(newPath ,12312311231232312);
         //res.writeHead(200, {'content-type': 'text/plain;charset=utf-8'});
         res.send({status:'1',msg:"上传成功",filePath:newPath});
         //res.status(200).end(newPath);
